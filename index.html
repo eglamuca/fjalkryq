@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Elbasani i Bukur – Fjalëkryq</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --primary-blue: #3498db;
+      --secondary-blue: #2980b9;
+      --dark-blue: #2c3e50;
+      --light-gray: #ecf0f1;
+      --background-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      --success-green: #2ecc71;
+      --error-red: #e74c3c;
+      --white: #fff;
+      --check-yellow: #f1c40f;
+    }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--background-gradient);
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      min-height: 100vh;
+      color: var(--dark-blue);
+    }
+    
+    h1 {
+      color: var(--dark-blue);
+      margin-bottom: 20px;
+      font-size: 2.2em;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .wrapper {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .grid-container {
+      background: var(--white);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(22, 30px);
+      gap: 2px;
+      background: #34495e;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    
+    .cell {
+      width: 30px;
+      height: 30px;
+      border: 1px solid #bdc3c7;
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: bold;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+    }
+    
+    .cell:not(.black):hover {
+      border-color: var(--primary-blue);
+      transform: scale(1.05);
+    }
+    
+    .cell.black {
+      background: var(--dark-blue);
+      border: 1px solid var(--dark-blue);
+      cursor: default;
+    }
+    
+    .cell:focus {
+      outline: none;
+      border-color: var(--error-red);
+      box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+      transform: scale(1.1);
+    }
+    
+    .cell.active {
+      background: #aed6f1; /* Light blue highlight for the whole word */
+    }
+
+    .cell.focus {
+      background: var(--primary-blue); /* Darker blue for the current cell */
+      color: var(--white);
+    }
+    
+    .cell.correct {
+      background: var(--success-green);
+      color: var(--white);
+      animation: success 0.6s ease;
+    }
+    
+    .cell.incorrect {
+      background: var(--error-red);
+      color: var(--white);
+      animation: shake 0.6s ease;
+    }
+    
+    @keyframes success {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    
+    .number {
+      position: absolute;
+      top: 1px;
+      left: 2px;
+      font-size: 9px;
+      color: var(--dark-blue);
+      font-weight: bold;
+      pointer-events: none; /* Make number unclickable */
+    }
+    
+    .clues {
+      background: var(--white);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      width: 350px;
+      text-align: left;
+    }
+    
+    .clues h3 {
+      margin: 0 0 15px 0;
+      color: var(--dark-blue);
+      font-size: 1.3em;
+      border-bottom: 2px solid var(--primary-blue);
+      padding-bottom: 8px;
+    }
+    
+    .clues ol {
+      margin: 0;
+      padding-left: 0;
+      list-style-position: inside;
+    }
+    
+    .clues li {
+      margin-bottom: 8px;
+      line-height: 1.4;
+      color: #34495e;
+      padding: 5px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .clues li.active {
+      background-color: #aed6f1;
+      font-weight: bold;
+    }
+
+    .controls {
+      margin-top: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    button {
+      margin: 5px;
+      padding: 12px 25px;
+      background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+      color: var(--white);
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    .clear-btn {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+    }
+    
+    .check-letter-btn {
+        background: linear-gradient(135deg, #f39c12, #f1c40f);
+        box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+    }
+
+    @media (max-width: 900px) {
+      .wrapper {
+        flex-direction: column;
+        align-items: center;
+      }
+      .clues {
+        width: 90%;
+        max-width: 500px;
+      }
+    }
+
+    @media (max-width: 550px) {
+      .grid {
+        grid-template-columns: repeat(15, 22px);
+      }
+      .cell {
+        width: 22px;
+        height: 22px;
+        font-size: 12px;
+      }
+       h1 {
+        font-size: 1.8em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>🏛️ Elbasani i Bukur – Fjalëkryq 🏛️</h1>
+  
+  <div class="wrapper">
+    <div class="grid-container">
+      <div id="grid" class="grid"></div>
+    </div>
+    
+    <div class="clues">
+      <h3>🔄 Horizontale</h3>
+      <ol id="across-clues"></ol>
+      
+      <h3>🔽 Vertikale</h3>
+      <ol id="down-clues"></ol>
+    </div>
+  </div>
+  
+  <div class="controls">
+    <button id="check-letter" class="check-letter-btn">🔍 Kontrollo Shkronjën</button>
+    <button id="check">✅ Kontrollo Fjalëkryqin</button>
+    <button id="reveal">💡 Trego Zgjidhjen</button>
+    <button id="clear" class="clear-btn">🗑️ Pastro</button>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const GRID_ROWS = 19;
+      const GRID_COLS = 22;
+      const gridElement = document.getElementById('grid');
+      const acrossCluesElement = document.getElementById('across-clues');
+      const downCluesElement = document.getElementById('down-clues');
+
+      const WORDS = [
+        { num: 1, dir: 'across', row: 0, col: 13, clue: 'Ëmbëlsira më e famshme e Elbasanit, e bërë me miell misri, gjalpë dhe sheqer.', answer: 'BALLOKUME'},
+        { num: 2, dir: 'across', row: 2, col: 6, clue: 'E ben elbasanin e vecante', answer: 'METALURGJIKU'},
+        { num: 3, dir: 'across', row: 5, col: 10, clue: 'Gatim tradicional me mish qengji, kos dhe vezë', answer: 'TAVEKOSI'},
+        { num: 9, dir: 'across', row: 10, col: 0, clue: 'Emri i lashtë romak i Elbasanit.', answer: 'SKAMPI'},
+        { num: 10, dir: 'across', row: 8, col: 5, clue: 'Rruga kombetare e krijuar nga romaket.', answer: 'EGNATIA'},
+        { num: 12, dir: 'across', row: 13, col: 5, clue: 'Piktor i famshëm ikonash, i lidhur me traditën e pikturës në Elbasan', answer: 'ONUFRI'},
+        { num: 13, dir: 'across', row: 15, col: 5, clue: ' Qytet i madh në qendër të Shqipërisë, i njohur për historinë dhe kulturën.', answer: 'ELBASANI'},
+        { num: 14, dir: 'across', row: 18, col: 18, clue: 'Fjalkryqi u krijua nga', answer: 'EGLA'},
+
+        { num: 1, dir: 'down', row: 0, col: 13, clue: 'Specialiteti i elbasanit', answer: 'BUGACE'},
+        { num: 4, dir: 'down', row: 4, col: 11, clue: 'Ëmbëlsirë tradicionale osmane, e përhapur edhe në Elbasan.', answer: 'BAKLAVA'},
+        { num: 5, dir: 'down', row: 5, col: 14, clue: 'Kështjella e famshme osmane', answer: 'KALAJA'},
+        { num: 6, dir: 'down', row: 6, col: 2, clue: 'Marta ishte zana e _', answer: 'LIBRAZHDIT'},
+        { num: 7, dir: 'down', row: 6, col: 9, clue: 'Estë tradicionale më 14 mars, e origjinës nga Elbasani.', answer: 'DITAEVERES'},
+        { num: 8, dir: 'down', row: 7, col: 5, clue: 'Mbi te nuk kalojne aviona', answer: 'PEQIN'},
+        { num: 11, dir: 'down', row: 10, col: 7, clue: 'Lumi kryesor që kalon përmes qytetit', answer: 'SHKUMBINI'}
+      ];
+
+      let cells = [];
+      let activeWord = null;
+      let direction = 'across';
+
+      // ** HELPER FUNCTION to get only the typed letter from a cell **
+      function getTypedLetter(cell) {
+          if (!cell) return '';
+          const numberSpan = cell.querySelector('.number');
+          const numberText = numberSpan ? numberSpan.textContent : '';
+          return cell.textContent.replace(numberText, '').trim().toUpperCase();
+      }
+
+      function init() {
+        const gridData = Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(null));
+
+        WORDS.forEach(word => {
+          word.len = word.answer.length;
+          word.cells = []; // Initialize cells array for each word
+          for (let i = 0; i < word.len; i++) {
+            const r = word.dir === 'across' ? word.row : word.row + i;
+            const c = word.dir === 'across' ? word.col + i : word.col;
+            if (r < GRID_ROWS && c < GRID_COLS) {
+              if (!gridData[r][c]) gridData[r][c] = {};
+              gridData[r][c].letter = word.answer[i];
+            }
+          }
+        });
+        
+        gridElement.innerHTML = '';
+        cells = [];
+        for (let r = 0; r < GRID_ROWS; r++) {
+          cells[r] = [];
+          for (let c = 0; c < GRID_COLS; c++) {
+            const cell = document.createElement('div');
+            cell.dataset.row = r;
+            cell.dataset.col = c;
+            
+            if (gridData[r][c]) {
+              cell.className = 'cell';
+              cell.contentEditable = true;
+              cell.spellcheck = false;
+              cell.addEventListener('keydown', handleKeyDown);
+              cell.addEventListener('click', handleCellClick);
+            } else {
+              cell.className = 'cell black';
+            }
+            gridElement.appendChild(cell);
+            cells[r][c] = cell;
+          }
+        }
+
+        acrossCluesElement.innerHTML = '';
+        downCluesElement.innerHTML = '';
+        WORDS.forEach(word => {
+          for (let i = 0; i < word.len; i++) {
+            const r = word.dir === 'across' ? word.row : word.row + i;
+            const c = word.dir === 'across' ? word.col + i : word.col;
+            if (cells[r] && cells[r][c]) {
+                word.cells.push(cells[r][c]);
+            }
+          }
+
+          const cell = cells[word.row][word.col];
+          if (cell && !cell.querySelector('.number')) {
+            const numberSpan = document.createElement('span');
+            numberSpan.className = 'number';
+            numberSpan.textContent = word.num;
+            cell.appendChild(numberSpan);
+          }
+          
+          const li = document.createElement('li');
+          li.innerHTML = `<strong>${word.num}.</strong> ${word.clue}`;
+          li.dataset.wordNum = word.num;
+          li.dataset.wordDir = word.dir;
+          li.addEventListener('click', () => handleClueClick(word));
+
+          if (word.dir === 'across') {
+            acrossCluesElement.appendChild(li);
+          } else {
+            downCluesElement.appendChild(li);
+          }
+        });
+
+        document.getElementById('check').addEventListener('click', checkGrid);
+        document.getElementById('check-letter').addEventListener('click', checkCurrentLetter);
+        document.getElementById('clear').addEventListener('click', clearGrid);
+        document.getElementById('reveal').addEventListener('click', revealAnswers);
+      }
+
+      function handleClueClick(word) {
+        setActiveWord(word);
+        if (word.cells[0]) word.cells[0].focus();
+      }
+
+      function handleCellClick(e) {
+        const cell = e.target.closest('.cell');
+        const row = parseInt(cell.dataset.row);
+        const col = parseInt(cell.dataset.col);
+
+        const acrossWord = findWordAt(row, col, 'across');
+        const downWord = findWordAt(row, col, 'down');
+
+        if (!acrossWord && !downWord) return;
+
+        if (activeWord && activeWord.cells.includes(cell) && acrossWord && downWord && activeWord !== (direction === 'across' ? downWord : acrossWord)) {
+            direction = (direction === 'across') ? 'down' : 'across';
+        }
+        
+        const newWord = (direction === 'across') ? acrossWord : downWord;
+        setActiveWord(newWord || acrossWord || downWord);
+      }
+      
+      function handleKeyDown(e) {
+        const cell = e.target;
+        
+        if (e.key.startsWith('Arrow')) {
+          e.preventDefault();
+          moveFocus(cell, e.key);
+          return;
+        }
+
+        if (e.key === 'Backspace') {
+          e.preventDefault();
+          if(getTypedLetter(cell) === '' && activeWord){
+              const currentIndex = activeWord.cells.indexOf(cell);
+              if (currentIndex > 0) {
+                  activeWord.cells[currentIndex - 1].focus();
+              }
+          } else {
+              cell.textContent = '';
+          }
+          return;
+        }
+        
+        if (e.key.match(/^[A-ZÇË]$/i) && e.key.length === 1) {
+            e.preventDefault();
+            cell.textContent = e.key.toUpperCase();
+            if (activeWord) {
+                const currentIndex = activeWord.cells.indexOf(cell);
+                if (currentIndex < activeWord.cells.length - 1) {
+                    activeWord.cells[currentIndex + 1].focus();
+                }
+            }
+        }
+      }
+      
+      function moveFocus(cell, key) {
+          let row = parseInt(cell.dataset.row);
+          let col = parseInt(cell.dataset.col);
+          if (key === 'ArrowUp') row--;
+          if (key === 'ArrowDown') row++;
+          if (key === 'ArrowLeft') col--;
+          if (key === 'ArrowRight') col++;
+          
+          if (row >= 0 && row < GRID_ROWS && col >= 0 && col < GRID_COLS) {
+            const nextCell = cells[row][col];
+            if (!nextCell.classList.contains('black')) {
+              nextCell.focus();
+            }
+          }
+      }
+
+      function findWordAt(row, col, dir) {
+        return WORDS.find(word => {
+          if (word.dir !== dir) return false;
+          if (dir === 'across') {
+            return word.row === row && col >= word.col && col < word.col + word.len;
+          }
+          if (dir === 'down') {
+            return word.col === col && row >= word.row && row < word.row + word.len;
+          }
+          return false;
+        });
+      }
+
+      function setActiveWord(word) {
+        if (!word) return;
+        activeWord = word;
+        direction = word.dir;
+        highlightActiveElements();
+      }
+
+      function highlightActiveElements() {
+        document.querySelectorAll('.cell.active, .cell.focus, li.active').forEach(el => {
+            el.classList.remove('active', 'focus');
+        });
+
+        if (!activeWord) return;
+
+        activeWord.cells.forEach(cell => cell.classList.add('active'));
+        
+        const focusedElement = document.activeElement;
+        if (focusedElement && focusedElement.classList.contains('cell')) {
+            focusedElement.classList.add('focus');
+            const row = parseInt(focusedElement.dataset.row);
+            const col = parseInt(focusedElement.dataset.col);
+            const word = findWordAt(row, col, direction) || findWordAt(row, col, direction === 'across' ? 'down' : 'across');
+            if(word) activeWord = word;
+        }
+
+        const clueElement = document.querySelector(`li[data-word-num='${activeWord.num}'][data-word-dir='${activeWord.dir}']`);
+        if(clueElement) {
+            clueElement.classList.add('active');
+        }
+      }
+      
+      // --- Control Button Functions ---
+      function checkGrid() {
+        let isPuzzleComplete = true;
+        
+        WORDS.forEach(word => {
+          word.cells.forEach((cell, index) => {
+            const userLetter = getTypedLetter(cell); // **FIXED HERE**
+            const correctLetter = word.answer[index].toUpperCase();
+            
+            cell.classList.remove('correct', 'incorrect');
+            
+            if (userLetter) {
+                if (userLetter === correctLetter) {
+                    cell.classList.add('correct');
+                } else {
+                    cell.classList.add('incorrect');
+                    isPuzzleComplete = false;
+                }
+            } else {
+                isPuzzleComplete = false;
+            }
+          });
+        });
+
+        if (isPuzzleComplete) {
+            setTimeout(() => alert('🎉 Urime! E keni plotësuar saktë fjalëkryqin! 🎉'), 300);
+        }
+      }
+
+      function checkCurrentLetter() {
+        const cell = document.activeElement;
+        if (!cell || !cell.classList.contains('cell') || cell.classList.contains('black')) {
+            alert('Ju lutem zgjidhni një kuti për të kontrolluar.');
+            return;
+        }
+        
+        const userLetter = getTypedLetter(cell); // **FIXED HERE**
+        
+        if (!userLetter) return;
+
+        if (!activeWord || !activeWord.cells.includes(cell)) {
+             const row = parseInt(cell.dataset.row);
+             const col = parseInt(cell.dataset.col);
+             setActiveWord(findWordAt(row, col, direction) || findWordAt(row, col, 'across') || findWordAt(row, col, 'down'));
+        }
+
+        if (!activeWord) return;
+
+        const index = activeWord.cells.indexOf(cell);
+        if (index === -1) return;
+
+        const correctLetter = activeWord.answer[index].toUpperCase();
+        
+        cell.classList.remove('correct', 'incorrect');
+        if (userLetter === correctLetter) {
+            cell.classList.add('correct');
+        } else {
+            cell.classList.add('incorrect');
+        }
+
+        setTimeout(() => cell.classList.remove('correct', 'incorrect'), 1500);
+      }
+
+      function revealAnswers() {
+        if (!confirm('Jeni të sigurt që doni të shikoni zgjidhjen?')) return;
+        WORDS.forEach(word => {
+          word.cells.forEach((cell, index) => {
+            cell.textContent = word.answer[index];
+            cell.classList.remove('incorrect');
+            cell.classList.add('correct');
+          });
+        });
+      }
+
+      function clearGrid() {
+        if (!confirm('Jeni të sigurt që doni të pastroni gjithçka?')) return;
+        document.querySelectorAll('.cell:not(.black)').forEach(cell => {
+          const numberSpan = cell.querySelector('.number');
+          cell.textContent = ''; // Clear text content
+          if(numberSpan) cell.appendChild(numberSpan); // Re-append number if it was cleared
+          cell.classList.remove('correct', 'incorrect', 'active', 'focus');
+        });
+        document.querySelectorAll('li.active').forEach(li => li.classList.remove('active'));
+        activeWord = null;
+      }
+
+      init();
+    });
+  </script>
+</body>
+</html>
